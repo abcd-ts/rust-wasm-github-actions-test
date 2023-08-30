@@ -1,0 +1,9 @@
+name: Build Wasm
+on: [push]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: mymindstorm/setup-emsdk@v11
+      - name: Verify
+        run: emcc -v
