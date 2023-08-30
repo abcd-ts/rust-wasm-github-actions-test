@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<head>
+  <title>test</title>
+  <meta charset="utf-8" />
+</head>
+<body>
+  <p id="value">0</p>
+  <input type="button" id="button" />
+  <script>
+    Module = {
+      onRuntimeInitialized: initialize,
+    };
+    const text = document.getElementById("value");
+    const button = document.getElementById("button");
+    let x = 0;
+    function initialize() {
+      fun = () => {
+        x = Module.ccall("increment", "number", ["number"], [x]);
+        console.log(x);
+        text.textContent = x;
+      };
+
+      button.addEventListener("click", (event) => fun());
+    }
+  </script>
+  <script async src="increment.js"></script>
+</body>
