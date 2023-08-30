@@ -4,6 +4,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: mymindstorm/setup-emsdk@v11
-      - name: Verify
-        run: emcc -v
+      - uses: actions/checkout@v3
+
+      - name: Setup emsdk
+        uses: mymindstorm/setup-emsdk@v11
+
+      - name: Build
+        run: source build.sh
