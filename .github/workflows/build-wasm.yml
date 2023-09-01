@@ -24,3 +24,11 @@ jobs:
 
       - name: Build
         run: cargo build --target wasm32-unknown-emscripten --release
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: my-artifact
+          path: |
+            output/increment.js
+            output/increment.wasm
