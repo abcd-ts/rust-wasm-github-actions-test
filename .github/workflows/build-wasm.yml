@@ -6,7 +6,7 @@ jobs:
       EMCC_CFLAGS: |
         -O3
         -o ./increment.js
-        -s EXPORTED_FUNCSIONS=['_increment']
+        -s EXPORTED_FUNCTIONS=['_increment']
         -s EXPORTED_RUNTIME_METHODS=ccall
 
     runs-on: ubuntu-latest
