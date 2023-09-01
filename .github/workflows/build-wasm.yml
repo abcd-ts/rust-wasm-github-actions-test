@@ -23,4 +23,4 @@ jobs:
           targets: wasm32-unknown-emscripten
 
       - name: Build
-        run: cargo build --release
+        run: cargo build --target wasm32-unknown-emscripten --release
