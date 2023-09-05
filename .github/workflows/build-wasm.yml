@@ -27,6 +27,9 @@ jobs:
           toolchain: stable
           targets: wasm32-unknown-emscripten
 
+      - name: Test
+        run: cargo test
+
       - name: Build
         run: cargo build --target wasm32-unknown-emscripten --release
 
@@ -36,16 +39,3 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./public
           force_orphan: true
-
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Setup cargo # キャッシュ使うべき?
-        uses: dtolnay/rust-toolchain@stable
-        with:
-          toolchain: stable
-
-      - name: Test
-        run: cargo test
