@@ -8,7 +8,7 @@ jobs:
     env:
       EMCC_CFLAGS: |
         -O3
-        -o ./output/increment.js
+        -o ./public/increment.js
         -s EXPORTED_FUNCTIONS=['_increment']
         -s EXPORTED_RUNTIME_METHODS=ccall
 
@@ -30,16 +30,9 @@ jobs:
       - name: Build
         run: cargo build --target wasm32-unknown-emscripten --release
 
-      - name: Upload artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: my-artifact
-          path: |
-            output/increment.js
-            output/increment.wasm
-
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./public
           force_orphan: true
