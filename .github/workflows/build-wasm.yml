@@ -25,14 +25,6 @@ jobs:
       - name: Build
         run: cargo build --target wasm32-unknown-emscripten --release
 
-      - name: Commit and push
-        run: |
-          git config user.name "Toshiya Saito"
-          git config user.email "saitou@ialab.cs.tsukuba.ac.jp"
-          git add .
-          git commit -m "add generated .wasm and .js"
-          git push
-
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
@@ -40,3 +32,8 @@ jobs:
           path: |
             output/increment.js
             output/increment.wasm
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
