@@ -25,11 +25,14 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
         with:
           toolchain: stable
-          components: rustfmt
+          components: rustfmt, clippy
           targets: wasm32-unknown-emscripten
 
       - name: Fmt
         run: cargo fmt --check
+
+      - name: Clippy
+        run: cargo clippy
 
       - name: Test
         run: cargo test
