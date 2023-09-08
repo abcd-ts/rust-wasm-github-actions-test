@@ -25,7 +25,11 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
         with:
           toolchain: stable
+          components: rustfmt
           targets: wasm32-unknown-emscripten
+
+      - name: Fmt
+        run: cargo fmt --check
 
       - name: Test
         run: cargo test
