@@ -16,7 +16,7 @@ pub unsafe extern "C" fn get_json_cst(json_str: *mut c_char) -> *mut c_char {
         .into_raw()
 }
 
-fn get_json_cst_core(json_str: &str) -> String {
+pub fn get_json_cst_core(json_str: &str) -> String {
     let mut parser = tree_sitter::Parser::new();
     parser.set_language(tree_sitter_json::language()).unwrap();
     let tree = parser.parse(json_str, None).unwrap();
