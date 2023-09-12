@@ -33,6 +33,7 @@ jobs:
       - name: Chech test file diff
         run: |
           diff=$(git diff --name-only testfiles/dst.txt)
+          echo "diff files: ${diff}"
           test -s diff
 
       - name: Build tree-sitter-json
