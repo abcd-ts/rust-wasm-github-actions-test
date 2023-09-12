@@ -5,6 +5,8 @@ pub extern "C" fn increment(n: u32) -> u32 {
     n + 1
 }
 
+/// # Safety
+/// dummy
 #[no_mangle]
 pub unsafe extern "C" fn get_json_cst(json_str: *mut c_char) -> *mut c_char {
     let json_str = CStr::from_ptr(json_str).to_str().unwrap().to_owned();
@@ -19,9 +21,11 @@ fn get_json_cst_core(json_str: &str) -> String {
     parser.set_language(tree_sitter_json::language()).unwrap();
     let tree = parser.parse(json_str, None).unwrap();
 
-    format!("{:?}", tree)
+    format!("{tree:?}")
 }
 
+/// # Safety
+/// dummy
 #[no_mangle]
 pub unsafe extern "C" fn free_string(ptr: *mut c_char) {
     if !ptr.is_null() {
