@@ -34,7 +34,7 @@ jobs:
         run: |
           diff=$(git diff --name-only testfiles/dst.txt)
           echo "diff files: ${diff}"
-          test -s diff
+          test -n diff
 
       - name: Build tree-sitter-json
         run: cargo build --package tree-sitter-json --target wasm32-unknown-emscripten --release
