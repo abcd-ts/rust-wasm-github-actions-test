@@ -1,4 +1,4 @@
-source ../emsdk/emsdk_env.sh
+source ../../emsdk/emsdk_env.sh
 
 export EMCC_CFLAGS="-O3"
 

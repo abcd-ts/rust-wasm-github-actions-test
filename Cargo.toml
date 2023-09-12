@@ -1,3 +1,6 @@
+[workspace]
+members = [".", "binding-napi", "binding-wasm"]
+
 [package]
 name = "rust-wasm-github-actions-test"
 version = "0.1.0"
@@ -5,9 +8,13 @@ edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
-[lib]
-crate-type = ["cdylib", "rlib"]
-
 [dependencies]
 tree-sitter = "0.20.10"
 tree-sitter-json = "0.19.0"
+
+[workspace.dependencies]
+rust-wasm-github-actions-test = { path = "." }
+
+# from napi
+[profile.release]
+lto = true
