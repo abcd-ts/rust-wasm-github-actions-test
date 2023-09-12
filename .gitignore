@@ -1,5 +1,5 @@
 /target
 
 # output
-*.js
-*.wasm
+public/increment.js
+public/increment.wasm
