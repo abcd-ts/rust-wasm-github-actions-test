@@ -21,6 +21,9 @@ jobs:
           components: rustfmt, clippy
           targets: wasm32-unknown-emscripten
 
+      - name: Cache cargo registory
+        uses: Swatinem/rust-cache@v2
+
       - name: Fmt
         run: cargo fmt --check
 
