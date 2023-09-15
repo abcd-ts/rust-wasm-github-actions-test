@@ -1,6 +1,9 @@
 [workspace]
 members = [".", "binding-napi", "binding-wasm"]
 
+[workspace.package]
+edition = "2021"
+
 [package]
 name = "rust-wasm-github-actions-test"
 version = "0.1.0"
