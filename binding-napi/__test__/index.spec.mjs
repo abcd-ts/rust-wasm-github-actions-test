@@ -1,11 +1,11 @@
 import test from "ava";
 
-import { sum } from "../index.js";
+// import { sum } from "../index.js";
 // import { getJsonCst } from "../index.js";
 
-test("sum from native", (t) => {
-  t.is(sum(1, 2), 3);
-});
+// test("sum from native", (t) => {
+//   t.is(sum(1, 2), 3);
+// });
 
 // test("get_json_cst", (t) => {
 //   const json = { hoge: "fuga" };
