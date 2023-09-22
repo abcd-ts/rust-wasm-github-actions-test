@@ -127,6 +127,15 @@ jobs:
           name: bindings-${{ matrix.settings.target }}
           path: ${{ env.WORK_DIR_NAME }}/${{ env.APP_NAME }}.*.node
           if-no-files-found: error
+      - name: Upload package unix
+        run: |
+          git checkout --orphan napi
+          git rm -rf ..
+          mv binding-napi*.tgz ../binding-napi-${{ matrix.settings.target }}.tgz
+          git add ../binging-napi-${{ matrix.settings.target }}.tgz
+          git push origin napi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   test-macOS-windows-binding:
     name: Test bindings on ${{ matrix.settings.target }} - node@${{ matrix.node }}
     needs:
