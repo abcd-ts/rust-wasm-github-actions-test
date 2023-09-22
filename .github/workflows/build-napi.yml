@@ -138,7 +138,6 @@ jobs:
           ls -a
           git add -f binding-napi-${{ matrix.settings.target }}.tgz
           echo 'check added files'
-          git clean -df
           git push origin napi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
