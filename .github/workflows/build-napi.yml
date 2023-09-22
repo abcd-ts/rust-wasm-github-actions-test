@@ -136,6 +136,7 @@ jobs:
           git checkout --orphan napi
           git rm -rf --ignore-unmatch .
           cp ./${{ env.WORK_DIR_NAME }}/binding-napi*.tgz binding-napi-${{ matrix.settings.target }}.tgz
+          git pull
           git add -f binding-napi-${{ matrix.settings.target }}.tgz
           git commit -m "commit package"
           git push origin napi
