@@ -130,14 +130,12 @@ jobs:
       - name: Upload package unix
         run: |
           npm pack
+          cd ..
           git checkout --orphan napi
-          git rm -rf --ignore-unmatch ../*
-          git rm -rf ../.gitignore
-          git rm -rf ../.github
-          cp binding-napi*.tgz ../binding-napi-${{ matrix.settings.target }}.tgz
-          ls -a ..
+          git rm -rf --ignore-unmatch
+          cp ./${{ env.WORK_DIR_NAME }}/binding-napi*.tgz binding-napi-${{ matrix.settings.target }}.tgz
           echo 'try git add'
-          git add -f ../binging-napi-${{ matrix.settings.target }}.tgz
+          git add -f binging-napi-${{ matrix.settings.target }}.tgz
           echo 'check added files'
           git status
           git push origin napi
