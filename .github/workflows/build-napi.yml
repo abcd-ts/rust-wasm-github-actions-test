@@ -135,7 +135,7 @@ jobs:
           git rm -rf ../.gitignore
           git rm -rf ../.github
           cp binding-napi*.tgz ../binding-napi-${{ matrix.settings.target }}.tgz
-          git add ../binging-napi-${{ matrix.settings.target }}.tgz -f
+          git add -f ../binging-napi-${{ matrix.settings.target }}.tgz
           git push origin napi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
