@@ -129,6 +129,7 @@ jobs:
           if-no-files-found: error
       - name: Upload package unix
         run: |
+          npm pack
           git checkout --orphan napi
           git rm -rf ..
           mv binding-napi*.tgz ../binding-napi-${{ matrix.settings.target }}.tgz
