@@ -135,8 +135,8 @@ jobs:
           git config --global user.name "Toshiya Saito"
           git checkout --orphan napi
           git rm -rf --ignore-unmatch .
-          cp ./${{ env.WORK_DIR_NAME }}/binding-napi*.tgz binding-napi-${{ matrix.settings.target }}.tgz
           git pull origin napi
+          cp ./${{ env.WORK_DIR_NAME }}/binding-napi*.tgz binding-napi-${{ matrix.settings.target }}.tgz
           git add -f binding-napi-${{ matrix.settings.target }}.tgz
           git commit -m "commit package"
           git push origin napi
