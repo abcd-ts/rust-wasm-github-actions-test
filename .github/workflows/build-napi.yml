@@ -135,7 +135,8 @@ jobs:
           git rm -rf --ignore-unmatch .
           cp ./${{ env.WORK_DIR_NAME }}/binding-napi*.tgz binding-napi-${{ matrix.settings.target }}.tgz
           git add -f binding-napi-${{ matrix.settings.target }}.tgz
-          git push -u origin napi
+          git commit -m "commit package"
+          git push origin napi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   test-macOS-windows-binding:
