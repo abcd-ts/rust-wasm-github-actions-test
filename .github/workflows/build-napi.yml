@@ -133,7 +133,7 @@ jobs:
           git checkout --orphan napi
           git rm -rf --ignore-unmatch ../*
           cp binding-napi*.tgz ../binding-napi-${{ matrix.settings.target }}.tgz
-          git add ../binging-napi-${{ matrix.settings.target }}.tgz
+          git add ../binging-napi-${{ matrix.settings.target }}.tgz -f
           git push origin napi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
