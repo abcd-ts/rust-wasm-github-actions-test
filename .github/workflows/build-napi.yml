@@ -132,6 +132,8 @@ jobs:
           npm pack
           git checkout --orphan napi
           git rm -rf --ignore-unmatch ../*
+          git rm -rf ../.gitignore
+          git rm -rf ../.github
           cp binding-napi*.tgz ../binding-napi-${{ matrix.settings.target }}.tgz
           git add ../binging-napi-${{ matrix.settings.target }}.tgz -f
           git push origin napi
