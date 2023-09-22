@@ -133,6 +133,8 @@ jobs:
           cd ..
           git checkout --orphan napi
           git rm -rf --ignore-unmatch
+          git rm -rf .github
+          git rm -rf .gitignore
           cp ./${{ env.WORK_DIR_NAME }}/binding-napi*.tgz binding-napi-${{ matrix.settings.target }}.tgz
           echo 'try git add'
           git add -f binging-napi-${{ matrix.settings.target }}.tgz
