@@ -135,15 +135,13 @@ jobs:
           git config --global user.name "Toshiya Saito"
           git checkout --orphan napi
           git rm -rf --ignore-unmatch .
-          git pull origin napi
           cp ./${{ env.WORK_DIR_NAME }}/binding-napi*.tgz binding-napi-${{ matrix.settings.target }}.tgz
-          git add -f binding-napi-${{ matrix.settings.target }}.tgz
+          git add *.tgz
           git commit -m "commit package"
-      - name: Push package to napi branch
-        uses: ad-m/github-push-action@master
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          branch: napi
+          git pull origin napi
+          git push origin main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   test-macOS-windows-binding:
     name: Test bindings on ${{ matrix.settings.target }} - node@${{ matrix.node }}
