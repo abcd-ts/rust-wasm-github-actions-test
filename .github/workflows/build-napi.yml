@@ -128,98 +128,98 @@ jobs:
           name: bindings-${{ matrix.settings.target }}
           path: ${{ env.WORK_DIR_NAME }}/${{ env.APP_NAME }}.*.node
           if-no-files-found: error
-      - name: Upload package
+  # - name: Upload package
+  #   run: |
+  #     git config --global user.email "saitou@ialab.cs.tsukuba.ac.jp"
+  #     git config --global user.name "Toshiya Saito"
+  #     npm pack
+  #     cd ..
+  #     git checkout --orphan ${{ matrix.settings.target }}
+  #     git rm -rf --ignore-unmatch .
+  #     cp ${{ env.WORK_DIR_NAME }}/binding-napi*.tgz binding-napi-${{ matrix.settings.target }}.tgz
+  #     git add binding-napi-${{ matrix.settings.target }}.tgz
+  #     git commit -m "commit package for ${{ matrix.settings.target }}"
+  #     git config pull.rebase false
+  #     git pull origin ${{ matrix.settings.target }}
+  #     git push origin ${{ matrix.settings.target }}
+  #   env:
+  #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  push-for-windows-x86:
+    name: Upload package for windows x86
+    needs:
+      - build
+    env:
+      TARGET: x86_64-pc-windows-msvc
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          check-latest: true
+          cache: yarn
+          cache-dependency-path: ./${{ env.WORK_DIR_NAME }}/yarn.lock
+      - name: Install dependencies
+        run: yarn install
+      - name: Download artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: bindings-${{ env.TARGET }}
+          path: ./${{ env.WORK_DIR_NAME }}
+      - name: Push package
         run: |
           git config --global user.email "saitou@ialab.cs.tsukuba.ac.jp"
           git config --global user.name "Toshiya Saito"
           npm pack
-          cd ..
-          git checkout --orphan ${{ matrix.settings.target }}
-          git rm -rf --ignore-unmatch .
-          cp ${{ env.WORK_DIR_NAME }}/binding-napi*.tgz binding-napi-${{ matrix.settings.target }}.tgz
-          git add binding-napi-${{ matrix.settings.target }}.tgz
-          git commit -m "commit package for ${{ matrix.settings.target }}"
-          git config pull.rebase false
-          git pull origin ${{ matrix.settings.target }}
-          git push origin ${{ matrix.settings.target }}
+          mkdir -p work_repo
+          cp binding-napi*.tgz work_repo/binding-napi-${{ env.TARGET }}.tgz
+          cd work_repo
+          git init
+          git remote add https://github.com/abcd-ts/rust-wasm-github-actions-test.git
+          git checkout --orphan napi
+          git add .
+          git commit -m "commit package for ${{ env.TARGET }}"
+          git push origin napi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  # push-for-windows-x86:
-  #   name: Upload package for windows x86
-  #   needs:
-  #     - build
-  #   env:
-  #     TARGET: x86_64-pc-windows-msvc
-  #   runs-on: windows-latest
-  #   steps:
-  #     - uses: actions/checkout@v3
-  #     - name: Setup node
-  #       uses: actions/setup-node@v3
-  #       with:
-  #         node-version: 18
-  #         check-latest: true
-  #         cache: yarn
-  #         cache-dependency-path: ./${{ env.WORK_DIR_NAME }}/yarn.lock
-  #     - name: Install dependencies
-  #       run: yarn install
-  #     - name: Download artifacts
-  #       uses: actions/download-artifact@v3
-  #       with:
-  #         name: bindings-${{ env.TARGET }}
-  #         path: ./${{ env.WORK_DIR_NAME }}
-  #     - name: Push package
-  #       run: |
-  #         git config --global user.email "saitou@ialab.cs.tsukuba.ac.jp"
-  #         git config --global user.name "Toshiya Saito"
-  #         npm pack
-  #         cd ..
-  #         git checkout --orphan napi
-  #         git rm -rf --ignore-unmatch .
-  #         cp ${{ env.WORK_DIR_NAME }}/binding-napi*.tgz binding-napi-${{ env.TARGET }}.tgz
-  #         git add binding-napi-${{ env.TARGET }}.tgz
-  #         git commit -m "commit package for ${{ env.TARGET }}"
-  #         git pull origin napi
-  #         git push origin napi
-  #       env:
-  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  # push-for-mac-arm64:
-  #   name: Upload package for mac arm64
-  #   needs:
-  #     - build
-  #   env:
-  #     TARGET: aarch64-apple-darwin
-  #   runs-on: macos-latest
-  #   steps:
-  #     - uses: actions/checkout@v3
-  #     - name: Setup node
-  #       uses: actions/setup-node@v3
-  #       with:
-  #         node-version: 18
-  #         check-latest: true
-  #         cache: yarn
-  #         cache-dependency-path: ./${{ env.WORK_DIR_NAME }}/yarn.lock
-  #     - name: Install dependencies
-  #       run: yarn install
-  #     - name: Download artifacts
-  #       uses: actions/download-artifact@v3
-  #       with:
-  #         name: bindings-${{ env.TARGET }}
-  #         path: ./${{ env.WORK_DIR_NAME }}
-  #     - name: Push package
-  #       run: |
-  #         git config --global user.email "saitou@ialab.cs.tsukuba.ac.jp"
-  #         git config --global user.name "Toshiya Saito"
-  #         npm pack
-  #         cd ..
-  #         git checkout --orphan napi
-  #         git rm -rf --ignore-unmatch .
-  #         cp ${{ env.WORK_DIR_NAME }}/binding-napi*.tgz binding-napi-${{ env.TARGET }}.tgz
-  #         git add binding-napi-${{ env.TARGET }}.tgz
-  #         git commit -m "commit package for ${{ env.TARGET }}"
-  #         git pull origin napi
-  #         git push origin napi
-  #       env:
-  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  push-for-mac-arm64:
+    name: Upload package for mac arm64
+    needs:
+      - build
+    env:
+      TARGET: aarch64-apple-darwin
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          check-latest: true
+          cache: yarn
+          cache-dependency-path: ./${{ env.WORK_DIR_NAME }}/yarn.lock
+      - name: Install dependencies
+        run: yarn install
+      - name: Download artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: bindings-${{ env.TARGET }}
+          path: ./${{ env.WORK_DIR_NAME }}
+      - name: Push package
+        run: |
+          git config --global user.email "saitou@ialab.cs.tsukuba.ac.jp"
+          git config --global user.name "Toshiya Saito"
+          npm pack
+          mkdir -p work_repo
+          cp binding-napi*.tgz work_repo/binding-napi-${{ env.TARGET }}.tgz
+          cd work_repo
+          git clone https://github.com/abcd-ts/rust-wasm-github-actions-test.git work_repo
+          git add .
+          git commit -m "commit package for ${{ env.TARGET }}"
+          git push origin napi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   test-macOS-windows-binding:
     name: Test bindings on ${{ matrix.settings.target }} - node@${{ matrix.node }}
