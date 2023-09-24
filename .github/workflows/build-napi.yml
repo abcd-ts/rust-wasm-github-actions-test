@@ -139,7 +139,7 @@ jobs:
           git add *.tgz
           git commit -m "commit package"
           git pull origin napi
-          git push origin napi
+          git push -f origin napi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
