@@ -185,6 +185,7 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           branch: napi
+          directory: work_repo
   push-for-mac-arm64:
     name: Upload package for mac arm64
     needs:
@@ -226,7 +227,7 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           branch: napi
-
+          directory: work_repo
   test-macOS-windows-binding:
     name: Test bindings on ${{ matrix.settings.target }} - node@${{ matrix.node }}
     needs:
