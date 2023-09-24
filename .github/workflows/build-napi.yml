@@ -127,17 +127,50 @@ jobs:
           name: bindings-${{ matrix.settings.target }}
           path: ${{ env.WORK_DIR_NAME }}/${{ env.APP_NAME }}.*.node
           if-no-files-found: error
-      - name: Commit package
+      # - name: Commit package
+      #   run: |
+      #     npm pack
+      #     cd ..
+      #     git config --global user.email "saitou@ialab.cs.tsukuba.ac.jp"
+      #     git config --global user.name "Toshiya Saito"
+      #     git checkout --orphan napi
+      #     git rm -rf --ignore-unmatch .
+      #     cp ./${{ env.WORK_DIR_NAME }}/binding-napi*.tgz binding-napi-${{ matrix.settings.target }}.tgz
+      #     git add binding-napi-${{ matrix.settings.target }}.tgz
+      #     git commit -m "commit package"
+      #     git pull origin napi
+      #     git push origin napi
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  push-for-windows-x86:
+    env:
+      TARGET: x86_64-pc-windows-msvc
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          check-latest: true
+          cache: yarn
+          cache-dependency-path: ./${{ env.WORK_DIR_NAME }}/yarn.lock
+      - name: Install dependencies
+        run: yarn install
+      - name: Download artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: bindings-${{ env.TARGET }}
+          path: ./${{ env.WORK_DIR_NAME }}
+      - name: Push package
         run: |
-          npm pack
-          cd ..
           git config --global user.email "saitou@ialab.cs.tsukuba.ac.jp"
           git config --global user.name "Toshiya Saito"
+          git pack
+          cd ..
           git checkout --orphan napi
           git rm -rf --ignore-unmatch .
-          cp ./${{ env.WORK_DIR_NAME }}/binding-napi*.tgz binding-napi-${{ matrix.settings.target }}.tgz
-          git add binding-napi-${{ matrix.settings.target }}.tgz
-          git commit -m "commit package"
+          cp ${{ env.WORK_DIR_NAME }}/bindings-napi*.tgz binding-${{ env.TARGET }}.tgz
           git pull origin napi
           git push origin napi
         env:
