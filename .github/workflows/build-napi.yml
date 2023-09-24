@@ -180,9 +180,11 @@ jobs:
           git checkout --orphan napi
           git add .
           git commit -m "commit package for ${{ env.TARGET }}"
-          git push origin napi
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: napi
   push-for-mac-arm64:
     name: Upload package for mac arm64
     needs:
@@ -217,9 +219,13 @@ jobs:
           git clone --branch napi https://github.com/abcd-ts/rust-wasm-github-actions-test.git work_repo
           git add .
           git commit -m "commit package for ${{ env.TARGET }}"
-          git push origin napi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: napi
 
   test-macOS-windows-binding:
     name: Test bindings on ${{ matrix.settings.target }} - node@${{ matrix.node }}
