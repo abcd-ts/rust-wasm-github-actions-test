@@ -136,9 +136,10 @@ jobs:
           git checkout --orphan napi
           git rm -rf --ignore-unmatch .
           cp ./${{ env.WORK_DIR_NAME }}/binding-napi*.tgz binding-napi-${{ matrix.settings.target }}.tgz
-          git add *.tgz
+          git add binding-napi-${{ matrix.settings.target }}.tgz
           git commit -m "commit package"
-          git push -f origin napi
+          git pull origin napi
+          git push origin napi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
