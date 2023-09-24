@@ -139,6 +139,7 @@ jobs:
           cp ${{ env.WORK_DIR_NAME }}/binding-napi*.tgz binding-napi-${{ matrix.settings.target }}.tgz
           git add binding-napi-${{ matrix.settings.target }}.tgz
           git commit -m "commit package for ${{ matrix.settings.target }}"
+          git pull origin ${{ matrix.settings.target }}
           git push origin ${{ matrix.settings.target }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
