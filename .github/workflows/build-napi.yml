@@ -180,6 +180,44 @@ jobs:
           git push origin napi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  push-for-mac-arm64:
+    name: Upload package for mac arm64
+    needs:
+      - build
+    env:
+      TARGET: aarch64-apple-darwin
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          check-latest: true
+          cache: yarn
+          cache-dependency-path: ./${{ env.WORK_DIR_NAME }}/yarn.lock
+      - name: Install dependencies
+        run: yarn install
+      - name: Download artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: bindings-${{ env.TARGET }}
+          path: ./${{ env.WORK_DIR_NAME }}
+      - name: Push package
+        run: |
+          git config --global user.email "saitou@ialab.cs.tsukuba.ac.jp"
+          git config --global user.name "Toshiya Saito"
+          git pack
+          cd ..
+          git checkout --orphan napi
+          git rm -rf --ignore-unmatch .
+          cp ${{ env.WORK_DIR_NAME }}/bindings-napi*.tgz bindings-${{ env.TARGET }}.tgz
+          git add bindings-${{ env.TARGET }}.tgz
+          git commit -m "commit package for ${{ env.TARGET }}"
+          git pull origin napi
+          git push origin napi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   test-macOS-windows-binding:
     name: Test bindings on ${{ matrix.settings.target }} - node@${{ matrix.node }}
