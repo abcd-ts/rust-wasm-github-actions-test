@@ -173,11 +173,12 @@ jobs:
           git config --global user.name "Toshiya Saito"
           npm pack
           mkdir -p work_repo
-          cp binding-napi*.tgz work_repo/binding-napi-${{ env.TARGET }}.tgz
           cd work_repo
           git init
           git remote add origin https://github.com/abcd-ts/rust-wasm-github-actions-test.git
           git checkout --orphan napi
+          git pull origin napi
+          cp ../binding-napi*.tgz binding-napi-${{ env.TARGET }}.tgz
           git add .
           git commit -m "commit package for ${{ env.TARGET }}"
       - name: Push changes
@@ -190,6 +191,7 @@ jobs:
     name: Upload package for mac arm64
     needs:
       - build
+      - push-for-windows-x86
     env:
       TARGET: aarch64-apple-darwin
     runs-on: macos-latest
@@ -215,9 +217,9 @@ jobs:
           git config --global user.name "Toshiya Saito"
           npm pack
           mkdir -p work_repo
-          cp binding-napi*.tgz work_repo/binding-napi-${{ env.TARGET }}.tgz
           cd work_repo
           git clone --branch napi https://github.com/abcd-ts/rust-wasm-github-actions-test.git work_repo
+          cp ../binding-napi*.tgz binding-napi-${{ env.TARGET }}.tgz
           git add .
           git commit -m "commit package for ${{ env.TARGET }}"
         env:
