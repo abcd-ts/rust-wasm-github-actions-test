@@ -176,7 +176,7 @@ jobs:
           cp binding-napi*.tgz work_repo/binding-napi-${{ env.TARGET }}.tgz
           cd work_repo
           git init
-          git remote add https://github.com/abcd-ts/rust-wasm-github-actions-test.git
+          git remote add origin https://github.com/abcd-ts/rust-wasm-github-actions-test.git
           git checkout --orphan napi
           git add .
           git commit -m "commit package for ${{ env.TARGET }}"
@@ -214,7 +214,7 @@ jobs:
           mkdir -p work_repo
           cp binding-napi*.tgz work_repo/binding-napi-${{ env.TARGET }}.tgz
           cd work_repo
-          git clone https://github.com/abcd-ts/rust-wasm-github-actions-test.git work_repo
+          git clone --branch napi https://github.com/abcd-ts/rust-wasm-github-actions-test.git work_repo
           git add .
           git commit -m "commit package for ${{ env.TARGET }}"
           git push origin napi
