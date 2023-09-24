@@ -160,7 +160,7 @@ jobs:
           git checkout --orphan napi
           git rm -rf --ignore-unmatch .
           cp ${{ env.WORK_DIR_NAME }}/binding-napi*.tgz binding-napi-${{ env.TARGET }}.tgz
-          git add bindings-${{ env.TARGET }}.tgz
+          git add binding-napi-${{ env.TARGET }}.tgz
           git commit -m "commit package for ${{ env.TARGET }}"
           git pull origin napi
           git push origin napi
