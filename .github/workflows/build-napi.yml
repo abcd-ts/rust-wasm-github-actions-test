@@ -170,7 +170,7 @@ jobs:
         run: |
           git config --global user.email "saitou@ialab.cs.tsukuba.ac.jp"
           git config --global user.name "Toshiya Saito"
-          git pack
+          npm pack
           cd ..
           git checkout --orphan napi
           git rm -rf --ignore-unmatch .
@@ -208,7 +208,7 @@ jobs:
         run: |
           git config --global user.email "saitou@ialab.cs.tsukuba.ac.jp"
           git config --global user.name "Toshiya Saito"
-          git pack
+          npm pack
           cd ..
           git checkout --orphan napi
           git rm -rf --ignore-unmatch .
