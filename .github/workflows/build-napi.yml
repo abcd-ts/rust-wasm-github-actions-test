@@ -143,6 +143,9 @@ jobs:
       #   env:
       #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   push-for-windows-x86:
+    name: Upload package for windows x86
+    needs:
+      - build
     env:
       TARGET: x86_64-pc-windows-msvc
     runs-on: windows-latest
