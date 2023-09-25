@@ -214,7 +214,7 @@ jobs:
           git remote add origin https://github.com/abcd-ts/rust-wasm-github-actions-test.git
           git add *.tgz
           git commit -m "commit package"
-          git push -f origin ${{ matrix.settings.target }}
+          git push -f -u origin ${{ matrix.settings.target }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
