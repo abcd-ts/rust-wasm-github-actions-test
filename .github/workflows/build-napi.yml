@@ -201,6 +201,7 @@ jobs:
           path: ./${{ env.WORK_DIR_NAME }}
       - name: Pack and push
         run: |
+          mkdir -p repo
           cp index.js repo/index.js
           cp index.d.ts repo/index.d.ts
           cp package.json repo/package.json
