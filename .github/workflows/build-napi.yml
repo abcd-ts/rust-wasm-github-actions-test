@@ -128,57 +128,21 @@ jobs:
           name: bindings-${{ matrix.settings.target }}
           path: ${{ env.WORK_DIR_NAME }}/${{ env.APP_NAME }}.*.node
           if-no-files-found: error
-  # - name: Upload package
-  #   run: |
-  #     git config --global user.email "saitou@ialab.cs.tsukuba.ac.jp"
-  #     git config --global user.name "Toshiya Saito"
-  #     npm pack
-  #     cd ..
-  #     git checkout --orphan ${{ matrix.settings.target }}
-  #     git rm -rf --ignore-unmatch .
-  #     cp ${{ env.WORK_DIR_NAME }}/binding-napi*.tgz binding-napi-${{ matrix.settings.target }}.tgz
-  #     git add binding-napi-${{ matrix.settings.target }}.tgz
-  #     git commit -m "commit package for ${{ matrix.settings.target }}"
-  #     git config pull.rebase false
-  #     git pull origin ${{ matrix.settings.target }}
-  #     git push origin ${{ matrix.settings.target }}
-  #   env:
-  #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
   push-package:
     strategy:
       fail-fast: false
+      max-parallel: 1
       matrix:
         settings:
-          - host: macos-latest
-            target: x86_64-apple-darwin
-            build: |
-              yarn build
-              strip -x *.node
           - host: windows-latest
             build: yarn build
             target: x86_64-pc-windows-msvc
-          - host: ubuntu-latest
-            target: x86_64-unknown-linux-gnu
-            docker: ghcr.io/napi-rs/napi-rs/nodejs-rust:lts-debian
-            build: |-
-              set -e &&
-              yarn build --target x86_64-unknown-linux-gnu &&
-              strip *.node
           - host: macos-latest
             target: aarch64-apple-darwin
             build: |
               yarn build --target aarch64-apple-darwin
-              strip -x *.node
-          - host: ubuntu-latest
-            target: aarch64-unknown-linux-gnu
-            docker: ghcr.io/napi-rs/napi-rs/nodejs-rust:lts-debian-aarch64
-            build: |-
-              set -e &&
-              yarn build --target aarch64-unknown-linux-gnu &&
-              aarch64-unknown-linux-gnu-strip *.node
-          - host: windows-latest
-            target: aarch64-pc-windows-msvc
-            build: yarn build --target aarch64-pc-windows-msvc
+              strip -x *.nodeå
     name: Upload package for ${{ matrix.settings.target }}
     needs: build
     runs-on: ${{ matrix.settings.host }}
