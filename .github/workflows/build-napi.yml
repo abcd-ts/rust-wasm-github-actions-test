@@ -182,7 +182,9 @@ jobs:
           git add --all
           git commit -m "commit package"
           git config pull.rebase false
+          echo "try `git pull`"
           git pull -Xours --allow-unrelated-histories origin ${{ matrix.settings.target }}
+          echo "try `git push`"
           git push -f origin master:${{ matrix.settings.target }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
