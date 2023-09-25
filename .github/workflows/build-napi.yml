@@ -144,17 +144,49 @@ jobs:
   #     git push origin ${{ matrix.settings.target }}
   #   env:
   #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  push-for-windows-x86:
-    name: Upload package for windows x86
-    needs:
-      - build
-    env:
-      TARGET: x86_64-pc-windows-msvc
-    runs-on: windows-latest
+  push-package:
+    strategy:
+      fail-fast: false
+      matrix:
+        settings:
+          - host: macos-latest
+            target: x86_64-apple-darwin
+            build: |
+              yarn build
+              strip -x *.node
+          - host: windows-latest
+            build: yarn build
+            target: x86_64-pc-windows-msvc
+          - host: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+            docker: ghcr.io/napi-rs/napi-rs/nodejs-rust:lts-debian
+            build: |-
+              set -e &&
+              yarn build --target x86_64-unknown-linux-gnu &&
+              strip *.node
+          - host: macos-latest
+            target: aarch64-apple-darwin
+            build: |
+              yarn build --target aarch64-apple-darwin
+              strip -x *.node
+          - host: ubuntu-latest
+            target: aarch64-unknown-linux-gnu
+            docker: ghcr.io/napi-rs/napi-rs/nodejs-rust:lts-debian-aarch64
+            build: |-
+              set -e &&
+              yarn build --target aarch64-unknown-linux-gnu &&
+              aarch64-unknown-linux-gnu-strip *.node
+          - host: windows-latest
+            target: aarch64-pc-windows-msvc
+            build: yarn build --target aarch64-pc-windows-msvc
+    name: Upload package for ${{ matrix.settings.target }}
+    needs: build
+    runs-on: ${{ matrix.settings.host }}
     steps:
       - uses: actions/checkout@v3
       - name: Setup node
         uses: actions/setup-node@v3
+        if: ${{ !matrix.settings.docker }}
         with:
           node-version: 18
           check-latest: true
@@ -165,71 +197,112 @@ jobs:
       - name: Download artifacts
         uses: actions/download-artifact@v3
         with:
-          name: bindings-${{ env.TARGET }}
+          name: bindings-${{ matrix.settings.target }}
           path: ./${{ env.WORK_DIR_NAME }}
-      - name: Push package
+      - name: Pack
         run: |
-          git config --global user.email "saitou@ialab.cs.tsukuba.ac.jp"
-          git config --global user.name "Toshiya Saito"
+          mkdir -p repo
+          cp index.js repo/index.js
+          cp index.d.ts repo/index.d.ts
+          cp package.json repo/package.json
+          mv *.node repo
+          cd repo
           npm pack
-          mkdir -p work_repo
-          cd work_repo
           git init
-          git remote add origin https://github.com/abcd-ts/rust-wasm-github-actions-test.git
-          git checkout --orphan napi
-          git pull origin napi
-          cp ../binding-napi*.tgz binding-napi-${{ env.TARGET }}.tgz
-          git add .
-          git commit -m "commit package for ${{ env.TARGET }}"
-      - name: Push changes
-        uses: ad-m/github-push-action@master
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          branch: napi
-          directory: ${{ env.WORK_DIR_NAME }}/work_repo
-  push-for-mac-arm64:
-    name: Upload package for mac arm64
-    needs:
-      - build
-      - push-for-windows-x86
-    env:
-      TARGET: aarch64-apple-darwin
-    runs-on: macos-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Setup node
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18
-          check-latest: true
-          cache: yarn
-          cache-dependency-path: ./${{ env.WORK_DIR_NAME }}/yarn.lock
-      - name: Install dependencies
-        run: yarn install
-      - name: Download artifacts
-        uses: actions/download-artifact@v3
-        with:
-          name: bindings-${{ env.TARGET }}
-          path: ./${{ env.WORK_DIR_NAME }}
-      - name: Push package
-        run: |
           git config --global user.email "saitou@ialab.cs.tsukuba.ac.jp"
           git config --global user.name "Toshiya Saito"
-          npm pack
-          mkdir -p work_repo
-          cd work_repo
-          git clone --branch napi https://github.com/abcd-ts/rust-wasm-github-actions-test.git work_repo
-          cp ../binding-napi*.tgz binding-napi-${{ env.TARGET }}.tgz
-          git add .
-          git commit -m "commit package for ${{ env.TARGET }}"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Push changes
-        uses: ad-m/github-push-action@master
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          branch: napi
-          directory: ${{ env.WORK_DIR_NAME }}/work_repo
+          git remote add origin https://github.com/abcd-ts/rust-wasm-github-actions-test.git
+          git checkout --orphan ${{ matrix.settings.target }}
+          git add *.tgz
+          git commit -m "commit package"
+          git push -f origin ${{ matrix.settings.target }}
+
+  # push-for-windows-x86:
+  #   name: Upload package for windows x86
+  #   needs:
+  #     - build
+  #   env:
+  #     TARGET: x86_64-pc-windows-msvc
+  #   runs-on: windows-latest
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     - name: Setup node
+  #       uses: actions/setup-node@v3
+  #       with:
+  #         node-version: 18
+  #         check-latest: true
+  #         cache: yarn
+  #         cache-dependency-path: ./${{ env.WORK_DIR_NAME }}/yarn.lock
+  #     - name: Install dependencies
+  #       run: yarn install
+  #     - name: Download artifacts
+  #       uses: actions/download-artifact@v3
+  #       with:
+  #         name: bindings-${{ env.TARGET }}
+  #         path: ./${{ env.WORK_DIR_NAME }}
+  #     - name: Push package
+  #       run: |
+  #         git config --global user.email "saitou@ialab.cs.tsukuba.ac.jp"
+  #         git config --global user.name "Toshiya Saito"
+  #         npm pack
+  #         mkdir -p work_repo
+  #         cd work_repo
+  #         git init
+  #         git remote add origin https://github.com/abcd-ts/rust-wasm-github-actions-test.git
+  #         git checkout --orphan napi
+  #         git pull origin napi
+  #         cp ../binding-napi*.tgz binding-napi-${{ env.TARGET }}.tgz
+  #         git add .
+  #         git commit -m "commit package for ${{ env.TARGET }}"
+  #     - name: Push changes
+  #       uses: ad-m/github-push-action@master
+  #       with:
+  #         github_token: ${{ secrets.GITHUB_TOKEN }}
+  #         branch: napi
+  #         directory: ${{ env.WORK_DIR_NAME }}/work_repo
+  # push-for-mac-arm64:
+  #   name: Upload package for mac arm64
+  #   needs:
+  #     - build
+  #     - push-for-windows-x86
+  #   env:
+  #     TARGET: aarch64-apple-darwin
+  #   runs-on: macos-latest
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     - name: Setup node
+  #       uses: actions/setup-node@v3
+  #       with:
+  #         node-version: 18
+  #         check-latest: true
+  #         cache: yarn
+  #         cache-dependency-path: ./${{ env.WORK_DIR_NAME }}/yarn.lock
+  #     - name: Install dependencies
+  #       run: yarn install
+  #     - name: Download artifacts
+  #       uses: actions/download-artifact@v3
+  #       with:
+  #         name: bindings-${{ env.TARGET }}
+  #         path: ./${{ env.WORK_DIR_NAME }}
+  #     - name: Push package
+  #       run: |
+  #         git config --global user.email "saitou@ialab.cs.tsukuba.ac.jp"
+  #         git config --global user.name "Toshiya Saito"
+  #         npm pack
+  #         mkdir -p work_repo
+  #         cd work_repo
+  #         git clone --branch napi https://github.com/abcd-ts/rust-wasm-github-actions-test.git work_repo
+  #         cp ../binding-napi*.tgz binding-napi-${{ env.TARGET }}.tgz
+  #         git add .
+  #         git commit -m "commit package for ${{ env.TARGET }}"
+  #       env:
+  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  #     - name: Push changes
+  #       uses: ad-m/github-push-action@master
+  #       with:
+  #         github_token: ${{ secrets.GITHUB_TOKEN }}
+  #         branch: napi
+  #         directory: ${{ env.WORK_DIR_NAME }}/work_repo
   test-macOS-windows-binding:
     name: Test bindings on ${{ matrix.settings.target }} - node@${{ matrix.node }}
     needs:
