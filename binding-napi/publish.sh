@@ -10,9 +10,11 @@ npm pack
 echo $TARGET
 git init
 git remote add origin https://github.com/abcd-ts/rust-wasm-github-actions-test.git
-echo "*.tgz binary" > .gitattributes
+echo "*.tgz binary" > .gitattribute
 git add --all
 git commit -m "commit package"
-git push -f origin master:$TARGET
+git config pull.rebase false
+git pull -Xours --allow-unrelated-histories origin $TARGET
+git push origin master:$TARGET
 cd ..
 rm -rf repo

@@ -199,15 +199,6 @@ jobs:
         with:
           name: bindings-${{ matrix.settings.target }}
           path: ./${{ env.WORK_DIR_NAME }}
-      - name: Setting working directory
-        run: |
-          mkdir -p repo
-          cd repo
-          git init
-          git config --global user.email "saitou@ialab.cs.tsukuba.ac.jp"
-          git config --global user.name "Toshiya Saito"
-          git remote add origin https://github.com/abcd-ts/rust-wasm-github-actions-test.git
-          git pull origin ${{ matrix.settings.target }}
       - name: Pack and push
         run: |
           cp index.js repo/index.js
@@ -215,12 +206,19 @@ jobs:
           cp package.json repo/package.json
           mv *.node repo
           cd repo
-          rm *.tgz
           npm pack
+
+          git init
+          git config --global user.email "saitou@ialab.cs.tsukuba.ac.jp"
+          git config --global user.name "Toshiya Saito"
+          git remote add origin https://github.com/abcd-ts/rust-wasm-github-actions-test.git
           echo "*.tgz binary" > .gitattributes
+
           git add --all
           git commit -m "commit package"
-          git push origin ${{ matrix.settings.target }}
+          git config pull.rebase false
+          git pull -Xours --allow-unrelated-histories origin ${{ matrix.settings.target }}
+          git push origin master:${{ matrix.settings.target }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
