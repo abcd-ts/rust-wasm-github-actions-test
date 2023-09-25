@@ -210,7 +210,7 @@ jobs:
           npm pack
           git init
           git config --global user.email "saitou@ialab.cs.tsukuba.ac.jp"
-          git config --global user.name "Toshiya Saito"
+          git config --global user.name "abcd-ts"
           git remote add origin https://github.com/abcd-ts/rust-wasm-github-actions-test.git
           echo "*.tgz binary" > .gitattributes
           git add --all
