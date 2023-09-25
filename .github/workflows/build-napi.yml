@@ -181,10 +181,9 @@ jobs:
 
           git add *.tgz
           git commit -m "commit package"
-          git config pull.rebase false
-          echo "try git pull"
-          git pull -Xours --allow-unrelated-histories origin ${{ matrix.settings.target }}
-          echo "try git push"
+          echo "check cleaned file"
+          git clean -n
+          echo "try git force push"
           git push -f origin master:${{ matrix.settings.target }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

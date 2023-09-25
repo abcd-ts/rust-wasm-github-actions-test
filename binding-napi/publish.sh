@@ -11,10 +11,8 @@ echo $TARGET
 git init
 git remote add origin https://github.com/abcd-ts/rust-wasm-github-actions-test.git
 echo "*.tgz binary" > .gitattribute
-git add --all
+git add *.tgz
 git commit -m "commit package"
-git config pull.rebase false
-git pull -Xours --allow-unrelated-histories origin $TARGET
-git push origin master:$TARGET
+git push -f origin master:$TARGET
 cd ..
 rm -rf repo
