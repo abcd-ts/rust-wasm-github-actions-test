@@ -183,10 +183,13 @@ jobs:
           git commit -m "commit package"
           echo "check cleaned file"
           git clean -n
-          echo "try git force push"
-          git push -f origin master:${{ matrix.settings.target }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          force: true
+          directory: ${{ env.WORK_DIR_NAME}}/repo
+          branch: ${{ matrix.settings.target }}
 
   # push-for-windows-x86:
   #   name: Upload package for windows x86
