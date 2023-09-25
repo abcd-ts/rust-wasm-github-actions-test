@@ -212,7 +212,6 @@ jobs:
           git config --global user.email "saitou@ialab.cs.tsukuba.ac.jp"
           git config --global user.name "Toshiya Saito"
           git remote add origin https://github.com/abcd-ts/rust-wasm-github-actions-test.git
-          git checkout --orphan ${{ matrix.settings.target }}
           git add *.tgz
           git commit -m "commit package"
           git push -f origin ${{ matrix.settings.target }}
