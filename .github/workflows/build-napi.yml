@@ -179,7 +179,7 @@ jobs:
           git remote add origin https://github.com/abcd-ts/rust-wasm-github-actions-test.git
           echo "*.tgz binary" > .gitattributes
 
-          git add --all
+          git add *.tgz
           git commit -m "commit package"
           git config pull.rebase false
           echo "try git pull"
