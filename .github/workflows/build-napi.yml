@@ -216,7 +216,7 @@ jobs:
           git add --all
           git status
           git commit -m "commit package"
-          git pull origin ${{ matrix.settings.target }}
+          git pull --allow-unrelated-histories origin ${{ matrix.settings.target }}
           git push -f origin ${{ matrix.settings.target }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
