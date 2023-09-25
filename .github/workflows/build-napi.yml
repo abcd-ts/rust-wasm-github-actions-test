@@ -211,14 +211,11 @@ jobs:
           git init
           git config --global user.email "saitou@ialab.cs.tsukuba.ac.jp"
           git config --global user.name "Toshiya Saito"
-          git config --global pull.rebase false
           git remote add origin https://github.com/abcd-ts/rust-wasm-github-actions-test.git
           echo "*.tgz binary" > .gitattributes
           git add --all
-          git status
           git commit -m "commit package"
-          git pull --allow-unrelated-histories origin ${{ matrix.settings.target }}
-          git push -f origin ${{ matrix.settings.target }}
+          git push -f origin master:${{ matrix.settings.target }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
