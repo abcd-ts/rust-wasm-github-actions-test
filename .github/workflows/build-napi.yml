@@ -216,6 +216,8 @@ jobs:
           git add *.tgz
           git commit -m "commit package"
           git push -f origin ${{ matrix.settings.target }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   # push-for-windows-x86:
   #   name: Upload package for windows x86
