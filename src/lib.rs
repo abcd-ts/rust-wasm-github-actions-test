@@ -10,6 +10,14 @@ pub fn get_json_cst_core(json_str: &str) -> String {
     format!("{tree:?}")
 }
 
+pub fn get_sql_cst_core(sql_str: &str) -> String {
+    let mut parser = tree_sitter::Parser::new();
+    parser.set_language(tree_sitter_sql::language()).unwrap();
+    let tree = parser.parse(sql_str, None).unwrap();
+
+    format!("{tree:?}")
+}
+
 #[allow(dead_code)]
 fn sum(array: &[i32]) -> i32 {
     array.iter().sum()
@@ -28,5 +36,15 @@ fn get_json_cst_test() {
     assert_eq!(
         get_json_cst_core(src),
         "{Tree {Node document (0, 0) - (0, 14)}}".to_owned()
+    )
+}
+
+#[cfg(test)]
+#[test]
+fn get_sql_cst_test() {
+    let src = r#"select a from b"#;
+    assert_eq!(
+        get_sql_cst_core(src),
+        "{Tree {Node document (0, 0) - (0, 15)}}".to_owned()
     )
 }

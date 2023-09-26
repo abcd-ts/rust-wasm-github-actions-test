@@ -5,3 +5,4 @@
 
 export function sum(a: number, b: number): number
 export function getJsonCst(jsonStr: string): string
+export function getSqlCst(sqlStr: string): string

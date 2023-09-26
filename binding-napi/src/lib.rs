@@ -14,3 +14,8 @@ pub fn sum(a: i32, b: i32) -> i32 {
 pub fn get_json_cst(json_str: String) -> String {
   get_json_cst_core(&json_str)
 }
+
+#[napi]
+pub fn get_sql_cst(sql_str: String) -> String {
+  get_json_cst_core(&sql_str)
+}

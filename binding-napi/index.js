@@ -252,7 +252,8 @@ if (!nativeBinding) {
   throw new Error(`Failed to load native binding`)
 }
 
-const { sum, getJsonCst } = nativeBinding
+const { sum, getJsonCst, getSqlCst } = nativeBinding
 
 module.exports.sum = sum
 module.exports.getJsonCst = getJsonCst
+module.exports.getSqlCst = getSqlCst
