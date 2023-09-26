@@ -8,6 +8,8 @@ permissions:
   contents: write
   id-token: write
 "on":
+  push:
+    branches: main
   workflow_dispatch: null
 jobs:
   build-napi:
@@ -188,10 +190,15 @@ jobs:
       - name: Install dependencies
         working-directory: ${{ env.WORK_DIR_NAME }}
         run: yarn install
-      - name: Download .node files
+      - name: Download .node files for apple
         uses: actions/download-artifact@v3
         with:
-          name: bindings-*
+          name: bindings-aarch64-apple-darwin
+          path: ./${{ env.WORK_DIR_NAME }}
+      - name: Download .node files for windows
+        uses: actions/download-artifact@v3
+        with:
+          name: bindings-x86_64-pc-windows-msvc
           path: ./${{ env.WORK_DIR_NAME }}
       - name: Package
         working-directory: ${{ env.WORK_DIR_NAME }}
