@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<head>
+  <title>test</title>
+  <meta charset="utf-8" />
+</head>
+<body>
+  <input type="button" id="button" value="NAN" />
+  <p></p>
+  <input type="text" id="json_text_area" value="{}" />
+  <input type="button" id="get_cst_button" value="GET CST" />
+  <input type="text" id="output_text_area" value="None" />
+  <script>
+    Module = {
+      onRuntimeInitialized: initialize,
+    };
+    const button = document.getElementById("button");
+    let x = 0;
+    button.value = x;
+
+    const text_area = document.getElementById("json_text_area");
+    const out_paragraph = document.getElementById("out");
+    const output_text_area = document.getElementById("output_text_area");
+
+    function initialize() {
+      inc = () => {
+        console.log("call inc()");
+        x = Module.ccall("increment", "number", ["number"], [x]);
+        console.log(x);
+        button.value = x;
+      };
+
+      button.addEventListener("click", (event) => inc());
+
+      get_cst = () => {
+        console.log("call get_cst()");
+
+        const json_str = text_area.value;
+        const ptr = Module.ccall(
+          "get_json_cst",
+          "number",
+          ["string"],
+          [json_str]
+        );
+        const tree_str = UTF8ToString(ptr);
+
+        console.log(tree_str);
+        output_text_area.value = tree_str;
+
+        Module.ccall("free_string", null, ["number"], [ptr]);
+      };
+
+      get_cst_button.addEventListener("click", (event) => get_cst());
+    }
+  </script>
+  <script async src="./increment.js"></script>
+</body>
