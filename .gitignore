@@ -3,3 +3,6 @@
 # output
 public/increment.js
 public/increment.wasm
+*.tgz
+
+.DS_Store

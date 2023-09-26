@@ -1,0 +1,216 @@
+name: Deploy
+env:
+  DEBUG: napi:*
+  APP_NAME: binding-napi
+  WORK_DIR_NAME: binding-napi
+  MACOSX_DEPLOYMENT_TARGET: "10.13"
+permissions:
+  contents: write
+  id-token: write
+"on":
+  workflow_dispatch: null
+jobs:
+  build-napi:
+    strategy:
+      fail-fast: false
+      matrix:
+        settings:
+          - host: macos-latest
+            target: x86_64-apple-darwin
+            build: |
+              yarn build
+              strip -x *.node
+          - host: windows-latest
+            build: yarn build
+            target: x86_64-pc-windows-msvc
+          - host: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+            docker: ghcr.io/napi-rs/napi-rs/nodejs-rust:lts-debian
+            build: |-
+              set -e &&
+              yarn build --target x86_64-unknown-linux-gnu &&
+              strip *.node
+          - host: macos-latest
+            target: aarch64-apple-darwin
+            build: |
+              yarn build --target aarch64-apple-darwin
+              strip -x *.node
+          - host: ubuntu-latest
+            target: aarch64-unknown-linux-gnu
+            docker: ghcr.io/napi-rs/napi-rs/nodejs-rust:lts-debian-aarch64
+            build: |-
+              set -e &&
+              yarn build --target aarch64-unknown-linux-gnu &&
+              aarch64-unknown-linux-gnu-strip *.node
+          - host: windows-latest
+            target: aarch64-pc-windows-msvc
+            build: yarn build --target aarch64-pc-windows-msvc
+    name: stable - ${{ matrix.settings.target }} - node@18
+    runs-on: ${{ matrix.settings.host }}
+    defaults:
+      run:
+        working-directory: ./binding-napi
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup node
+        uses: actions/setup-node@v3
+        if: ${{ !matrix.settings.docker }}
+        with:
+          node-version: 18
+          check-latest: true
+          cache: yarn
+          cache-dependency-path: ./${{ env.WORK_DIR_NAME }}/yarn.lock
+      - name: Install
+        uses: dtolnay/rust-toolchain@stable
+        if: ${{ !matrix.settings.docker }}
+        with:
+          toolchain: stable
+          targets: ${{ matrix.settings.target }}
+      - name: Cache cargo
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            .cargo-cache
+            target/
+          key: ${{ matrix.settings.target }}-cargo-${{ matrix.settings.host }}
+      - uses: goto-bus-stop/setup-zig@v2
+        if: ${{ matrix.settings.target == 'armv7-unknown-linux-gnueabihf' }}
+        with:
+          version: 0.10.1
+      - name: Setup toolchain
+        run: ${{ matrix.settings.setup }}
+        if: ${{ matrix.settings.setup }}
+        shell: bash
+      - name: Setup node x86
+        if: matrix.settings.target == 'i686-pc-windows-msvc'
+        run: yarn config set supportedArchitectures.cpu "ia32"
+        shell: bash
+      - name: Install dependencies
+        run: yarn install
+      - name: Setup node x86
+        uses: actions/setup-node@v3
+        if: matrix.settings.target == 'i686-pc-windows-msvc'
+        with:
+          node-version: 18
+          check-latest: true
+          cache: yarn
+          architecture: x86
+          cache-dependency-path: ./${{ env.WORK_DIR_NAME }}/yarn.lock
+      - name: Build in docker
+        uses: addnab/docker-run-action@v3
+        if: ${{ matrix.settings.docker }}
+        with:
+          image: ${{ matrix.settings.docker }}
+          options: "--user 0:0 -v ${{ github.workspace }}/.cargo-cache/git/db:/usr/local/cargo/git/db -v ${{ github.workspace }}/.cargo/registry/cache:/usr/local/cargo/registry/cache -v ${{ github.workspace }}/.cargo/registry/index:/usr/local/cargo/registry/index -v ${{ github.workspace }}:/build -w /build/${{ env.WORK_DIR_NAME }}"
+          run: ${{ matrix.settings.build }}
+      - name: Build
+        run: ${{ matrix.settings.build }}
+        if: ${{ !matrix.settings.docker }}
+        shell: bash
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: bindings-${{ matrix.settings.target }}
+          path: ${{ env.WORK_DIR_NAME }}/${{ env.APP_NAME }}.*.node
+          if-no-files-found: error
+  build-wasm:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup emsdk
+        uses: mymindstorm/setup-emsdk@v11
+
+      - name: Setup cargo
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+          components: rustfmt, clippy
+          targets: wasm32-unknown-emscripten
+
+      - name: Cache cargo registory
+        uses: Swatinem/rust-cache@v2
+
+      - name: Fmt
+        run: cargo fmt --check
+
+      - name: Clippy
+        run: cargo clippy -- --deny warnings
+
+      - name: Test
+        run: cargo test
+
+      - name: Chech test file diff
+        run: |
+          diff=$(git diff --name-only testfiles/dst.txt)
+          echo "diff files: ${diff}"
+          test -n diff
+
+      - name: Build tree-sitter-json
+        run: cargo build --package tree-sitter-json --target wasm32-unknown-emscripten --release
+        env:
+          EMCC_CFLAGS: -O3
+
+      - name: Build My Library
+        run: cargo build --package binding-wasm --target wasm32-unknown-emscripten --release
+        env:
+          EMCC_CFLAGS: |
+            -O3
+            -o ./public/increment.js
+            -s EXPORTED_FUNCTIONS=['_increment','_get_json_cst','_free_string']
+            -s EXPORTED_RUNTIME_METHODS=ccall
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: wasm-and-js
+          path: |
+            public/increment.js
+            public/increment.wasm
+          if-no-files-found: error
+  deploy-to-gh-pages:
+    needs: [build-wasm, build-napi]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          check-latest: true
+          cache: yarn
+          cache-dependency-path: ./${{ env.WORK_DIR_NAME }}/yarn.lock
+      - name: Install dependencies
+        working-directory: ${{ env.WORK_DIR_NAME }}
+        run: yarn install
+      - name: Download .node files
+        uses: actions/download-artifact@v3
+        with:
+          name: bindings-*
+          path: ./${{ env.WORK_DIR_NAME }}
+      - name: Package
+        working-directory: ${{ env.WORK_DIR_NAME }}
+        run: mkdir -p repo
+          cp index.js repo/index.js
+          cp index.d.ts repo/index.d.ts
+          cp package.json repo/package.json
+          mv *.node repo
+          cd repo
+          npm pack
+          mv *.tgz ../../public
+      - name: Download wasm
+        uses: actions/download-artifact@v3
+        with:
+          name: wasm-and-js
+          path: ./public
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./public
+          force_orphan: true
