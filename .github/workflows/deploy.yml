@@ -188,7 +188,8 @@ jobs:
           path: ./${{ env.WORK_DIR_NAME }}
       - name: Package
         working-directory: ${{ env.WORK_DIR_NAME }}
-        run: mkdir -p repo
+        run: |
+          mkdir -p repo
           cp index.js repo/index.js
           cp index.d.ts repo/index.d.ts
           cp package.json repo/package.json
