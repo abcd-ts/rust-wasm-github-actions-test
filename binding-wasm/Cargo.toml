@@ -10,3 +10,6 @@ crate-type = ["cdylib"]
 
 [dependencies]
 rust-wasm-github-actions-test = { workspace = true }
+
+[build-dependencies]
+cc = "*"

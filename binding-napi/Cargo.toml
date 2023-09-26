@@ -14,3 +14,4 @@ rust-wasm-github-actions-test = { workspace = true }
 
 [build-dependencies]
 napi-build = "2.0.1"
+cc = "*"
