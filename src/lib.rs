@@ -45,6 +45,6 @@ fn get_sql_cst_test() {
     let src = r#"select a from b"#;
     assert_eq!(
         get_sql_cst_core(src),
-        "{Tree {Node document (0, 0) - (0, 15)}}".to_owned()
+        "{Tree {Node source_file (0, 0) - (0, 15)}}".to_owned()
     )
 }
