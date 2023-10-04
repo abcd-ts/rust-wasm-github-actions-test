@@ -12,7 +12,10 @@ permissions:
     branches: main
   workflow_dispatch: null
 jobs:
+  test:
+    uses: ./.github/workflows/test.yml
   build-napi:
+    needs: test
     strategy:
       fail-fast: false
       matrix:
@@ -124,6 +127,7 @@ jobs:
           path: ${{ env.WORK_DIR_NAME }}/${{ env.APP_NAME }}.*.node
           if-no-files-found: error
   build-wasm:
+    needs: test
     runs-on: ubuntu-latest
     permissions:
       contents: write

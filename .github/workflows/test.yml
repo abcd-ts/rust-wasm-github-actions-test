@@ -1,0 +1,37 @@
+name: test and check
+on:
+  push:
+  workflow_call: null
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup cargo
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+          components: rustfmt, clippy
+          targets: wasm32-unknown-emscripten
+
+      - name: Cache cargo registory
+        uses: Swatinem/rust-cache@v2
+
+      - name: Cargo check
+        run: |
+          result=$(cargo check --quiet)
+          test -n result
+
+      - name: Fmt
+        run: cargo fmt --check
+
+      - name: Clippy
+        run: cargo clippy -- --deny warnings
+
+      - name: Test
+        run: cargo test
+
+      - name: Chech test file diff
+        run: |
+          git diff --name-only --exit-code testfiles/dst.txt
